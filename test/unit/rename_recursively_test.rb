@@ -1,21 +1,23 @@
 require 'test_helper'
 
-describe Fileman.rename_r do
+describe "#Fileman.rename_r" do
 	let(:folder_name) { "TestFolder" }
+	let(:new_folder_name) { "a" }
 
 	before do
+		FileUtils.remove_dir(folder_name) if File.directory?(folder_name)
 		FileUtils.mkdir folder_name
 		FileUtils.mkdir "#{folder_name}/SubFolder_1"
 		FileUtils.mkdir "#{folder_name}/SubFolder_2"
-		FileUtils.mkdir "#{folder_name}/SubFolder_1/test_file.txt"
-		FileUtils.mkdir "#{folder_name}/SubFolder_2/test_file.txt"
+		FileUtils.touch "#{folder_name}/SubFolder_1/test_file.txt"
+		FileUtils.touch "#{folder_name}/SubFolder_2/test_file.txt"
 	end
 
 	after do
-		FileUtils.remove_dir 'TestFolder'
+		FileUtils.remove_dir(new_folder_name) if File.directory?(new_folder_name)
 	end
 
-	describe '#rename folder' do
+	describe 'rename folder' do
 
 		it 'rename the folder and all its subfolders recursively' do
 			File.directory?(folder_name).must_equal true
@@ -24,29 +26,29 @@ describe Fileman.rename_r do
 			File.file?("#{folder_name}/SubFolder_1/test_file.txt").must_equal true
 			File.file?("#{folder_name}/SubFolder_2/test_file.txt").must_equal true
 
-			Fileman.rename_r folder_name, 'a'
+			Fileman.rename_r folder_name, new_folder_name
 
-			File.directory?(folder_name).must_equal true
+			File.directory?("a").must_equal true
+			File.directory?("a/a").must_equal true
 			File.directory?("a/a1").must_equal true
-			File.directory?("a/a2").must_equal true
+			File.file?("a/a/test_file.txt").must_equal true
 			File.file?("a/a1/test_file.txt").must_equal true
-			File.file?("a/a2/test_file.txt").must_equal true
 		end
 
-		it 'rename the folder and all its subfolders recursively, including all files if option :include_file is true' do
+		it 'rename the folder and all its subfolders recursively, including all files if option :include_files is true' do
 			File.directory?(folder_name).must_equal true
 			File.directory?("#{folder_name}/SubFolder_1").must_equal true
 			File.directory?("#{folder_name}/SubFolder_2").must_equal true
 			File.file?("#{folder_name}/SubFolder_1/test_file.txt").must_equal true
 			File.file?("#{folder_name}/SubFolder_2/test_file.txt").must_equal true
 
-			Fileman.rename_r folder_name, 'a', {:include_file => true}
+			Fileman.rename_r folder_name, new_folder_name, {:include_files => true}
 
-			File.directory?(folder_name).must_equal true
+			File.directory?("a").must_equal true
+			File.directory?("a/a").must_equal true
 			File.directory?("a/a1").must_equal true
-			File.directory?("a/a2").must_equal true
+			File.file?("a/a/a").must_equal true
 			File.file?("a/a1/a").must_equal true
-			File.file?("a/a2/a").must_equal true
 		end
 	end
 end
