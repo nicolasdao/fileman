@@ -1,6 +1,6 @@
 # Fileman
 
-Fileman was originally designed to solve the Windows delete issue when a folder contains files whose path is greater than 260 characters. Over time, it got extended to support other features like renaming files following patterns. Though it was originally develop to solve a specific Windows limitation, Fileman can obviously also be used on any other platform supporting ruby. 
+Fileman was originally designed to solve the Windows delete issue when a folder contains files whose path is greater than 260 characters. Over time, it got extended to support other features like renaming files following patterns. Though it was originally developed to solve a specific Windows limitation, Fileman can obviously be used on any other platform supporting ruby. 
 
 ## Installation
 
