@@ -1,6 +1,6 @@
 # Fileman
 
-TODO: Write a gem description
+Fileman was originally designed to solve the Windows delete issue when a folder contains files whose path is greater than 260 characters. Over time, it got extended to support other features like renaming files inside folders following patterns.
 
 ## Installation
 
@@ -17,8 +17,27 @@ Or install it yourself as:
     $ gem install fileman
 
 ## Usage
-
-TODO: Write usage instructions here
+### Overview 
+Once installed, fileman is immediately available in the terminal through the 'fileman' or 'fm' command. For more details, simply type:
+```sh
+fm
+```
+### Examples
+#### Delete a folder
+```sh
+fm rm your_folder
+```
+#### Rename a folder as well as all its subfolders
+```sh
+fm rn "your_folder" "new_name"
+```
+#### Rename a folder as well as all its subfolder, including files
+```sh
+fm rn "your_folder" "new_name" -i
+#### Rename a folder as well as all its subfolder, including files without the files extension
+```sh
+fm rn "your_folder" "new_name" -ie
+```
 
 ## Contributing
 

@@ -18,7 +18,8 @@ def rename_help(rename_command)
 	text = "usage: fileman #{rename_command} <path> <new-name> [<args>]\n" +
 	"\n" +
 	"Optional arguments are:\n" +
-	" -i\t Include files so they are also renamed" 
+	" -i\t Include files so they are also renamed\n" +
+	" -e\t Remove files extension. Only valid if -i option is also specified" 
 	puts text.colorize(:yellow)
 end
 
@@ -42,18 +43,39 @@ def command_help(command)
 	end
 end
 
+def get_rename_options
+	args = ARGV.clone
+	args.shift(3) # ignore the first 2 arguments by removing them from the array
+	options = {}
+	if (args.size > 0)
+		args.each { |x|
+			x.gsub('-', '').split('').each { |y|
+				case y
+				when 'i'
+					options[:include_files] = true
+				when 'e'
+					options[:ignore_ext] = true
+				end
+			}
+		}
+	end
+	return options
+end
+
 def get_rename_arguments
 	arguments = {}
 	args = ARGV.clone
-	args.shift(1) # ignore the first 2 arguments by removing them from the array
+	args.shift(1) # ignore the first argument by removing them from the array
 	arguments[:path] = args[0]
 	arguments[:name] = args[1]
-	arguments[:file] = (args[2] == '-f') if (args.size > 1)
+	options = get_rename_options
+	arguments[:include_files] = options[:include_files]
+	arguments[:ignore_ext] = options[:ignore_ext]
 	
 	return arguments
 end
 
-# Usage: fileman rn -p="your_folder_path" -n="new_name" -f=true
+# Usage: fileman rn "your_folder_path" "new_name" -ie
 def rename
 	argsize = ARGV.size
 	if argsize == 1
@@ -63,7 +85,8 @@ def rename
 	else
 		args = get_rename_arguments
 		options = {}
-		options[:include_files] = true if args[:file]
+		options[:include_files] = true if args[:include_files]
+		options[:ignore_ext] = true if args[:ignore_ext]
 		Fileman.rename_r(args[:path], args[:name], options) unless args[:error]
 	end
 end

@@ -15,6 +15,8 @@ module Fileman
 	# 						be 'a1' and 'a2')
 	# +options+				Optional parameters defined as follow:
 	# 	+:include_files+	If true, all files will also be renamed. Extensions will be removed 
+	#   +:ignore_ext+		If true, and if 'include_files' is also true, then file's extensions
+	# 						are ignored
 	# 
 	# Returns the new name of the root folder
 	def rename_r(folder_path, new_name, options={})
@@ -23,11 +25,13 @@ module Fileman
 
 		rename_item = lambda { |f, is_item_func|
 			parent_folder = File.expand_path("../", f)
+			file_ext = options[:ignore_ext] ? '' : File.extname(f)
 			counter = 0
-			while is_item_func.call(File.join(parent_folder, increment_name.call(counter))) do 
+			while is_item_func.call(File.join(parent_folder, "#{increment_name.call(counter)}#{file_ext}")) do 
 				counter+=1 
 			end
 			final_name = increment_name.call(counter)
+			final_name = "#{final_name}#{file_ext}" unless options[:ignore_ext]
 			FileUtils.mv f, File.join(parent_folder, final_name)
 			final_name
 		}
@@ -36,7 +40,11 @@ module Fileman
 		is_file = lambda { |x| File.file? x}
 
 		final_new_name = new_name
-		(Dir["#{folder_path}/**/*"].reverse << folder_path).each { |f|
+		all_items = Dir["#{folder_path}/**/*"]
+		items_per_folder = all_items.group_by { |x| File.expand_path('../',x)}
+		
+		sorted_items = items_per_folder.map { |k,v| v.sort_by{|y| y}.reverse }.flatten.reverse 
+		(sorted_items << folder_path).each { |f|
 			if File.directory?(f)
 				final_new_name = rename_item.call(f, is_dir)
 			elsif include_files && File.file?(f)
