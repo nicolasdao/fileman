@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["nicolas.dao@gmail.com"]
   spec.summary       = %q{Files and directories management in windows with super powers}
   spec.description   = %q{Enhance files and directories management in windows(e.g. deleting files and folders whose path is longer than 260 charatcers)}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/nicolasdao/fileman"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
