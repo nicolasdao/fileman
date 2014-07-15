@@ -34,6 +34,7 @@ fm rn "your_folder" "new_name"
 #### Rename a folder as well as all its subfolder, including files
 ```sh
 fm rn "your_folder" "new_name" -i
+```
 #### Rename a folder as well as all its subfolder, including files without the files extension
 ```sh
 fm rn "your_folder" "new_name" -ie
