@@ -14,43 +14,42 @@ module Fileman
 	#						2 subfolder 'subf_a' and 'subf_b', then the new names will respectively 
 	# 						be 'a1' and 'a2')
 	# +options+				Optional parameters defined as follow:
-	# 	+:include_files+	If true, all files will also be renamed. Extensions will be removed 
+	# 	+:include_files+	If true, all files will also be renamed. Extensions will be removed. 
+	# 						Default is false 
 	#   +:ignore_ext+		If true, and if 'include_files' is also true, then file's extensions
-	# 						are ignored
+	# 						are ignored. Default is false
 	# 
 	# Returns the new name of the root folder
 	def rename_r(folder_path, new_name, options={})
 		include_files = !options[:include_files].nil? && options[:include_files]
+		ignore_ext = !options[:ignore_ext].nil? && options[:ignore_ext]
 		increment_name = lambda { |inc| inc == 0 ? new_name : "#{new_name}#{inc}" }
 
-		rename_item = lambda { |f, is_item_func|
+		rename_item = lambda { |f|
 			parent_folder = File.expand_path("../", f)
-			file_ext = options[:ignore_ext] ? '' : File.extname(f)
+			file_ext = ignore_ext ? '' : File.extname(f)
 			counter = 0
-			while is_item_func.call(File.join(parent_folder, "#{increment_name.call(counter)}#{file_ext}")) do 
+			while File.exists?(File.join(parent_folder, "#{increment_name.call(counter)}#{file_ext}")) do 
 				counter+=1 
 			end
 			final_name = increment_name.call(counter)
-			final_name = "#{final_name}#{file_ext}" unless options[:ignore_ext]
+			final_name = "#{final_name}#{file_ext}" unless ignore_ext
 			FileUtils.mv f, File.join(parent_folder, final_name)
 			final_name
 		}
 
-		is_dir = lambda { |x| File.directory? x}
-		is_file = lambda { |x| File.file? x}
-
-		final_new_name = new_name
-		all_items = Dir["#{folder_path}/**/*"]
+		final_root_folder_new_name = new_name
+		all_items = Dir.glob("#{folder_path}/**/*", File::FNM_DOTMATCH) - %w[. ..]
 		items_per_folder = all_items.group_by { |x| File.expand_path('../',x)}
 		
 		sorted_items = items_per_folder.map { |k,v| v.sort_by{|y| y}.reverse }.flatten.reverse 
 		(sorted_items << folder_path).each { |f|
 			if File.directory?(f)
-				final_new_name = rename_item.call(f, is_dir)
+				final_root_folder_new_name = rename_item.call(f)
 			elsif include_files && File.file?(f)
-				rename_item.call(f, is_file)
+				rename_item.call(f)
 			end
 		}
-		return final_new_name
+		return final_root_folder_new_name
 	end
 end
