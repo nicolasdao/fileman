@@ -18,8 +18,9 @@ def rename_help(rename_command)
 	text = "usage: fileman #{rename_command} <path> <new-name> [<args>]\n" +
 	"\n" +
 	"Optional arguments are:\n" +
-	" -i\t Include files so they are also renamed\n" +
-	" -e\t Remove files extension. Only valid if -i option is also specified" 
+	" -r\t Recursive rename. That means that if the path points to a folder, all its content will also be renamed\n" +
+	" -i\t Include files so they are also renamed. This option implicitly uses recursive rename(no need to use the -r option)\n" +
+	" -e\t Remove files extension. Only valid if the -i option is also specified" 
 	puts text.colorize(:yellow)
 end
 
@@ -55,6 +56,8 @@ def get_rename_options
 					options[:include_files] = true
 				when 'e'
 					options[:ignore_ext] = true
+				when 'r'
+					options[:recursive] = true
 				end
 			}
 		}
@@ -71,6 +74,7 @@ def get_rename_arguments
 	options = get_rename_options
 	arguments[:include_files] = options[:include_files]
 	arguments[:ignore_ext] = options[:ignore_ext]
+	arguments[:recursive] = options[:recursive]
 	
 	return arguments
 end
@@ -87,7 +91,8 @@ def rename
 		options = {}
 		options[:include_files] = true if args[:include_files]
 		options[:ignore_ext] = true if args[:ignore_ext]
-		Fileman.rename_r(args[:path], args[:name], options) unless args[:error]
+		options[:recursive] = true if args[:recursive]
+		Fileman.rename(args[:path], args[:name], options) unless args[:error]
 	end
 end
 

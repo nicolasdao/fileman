@@ -1,6 +1,6 @@
 require 'test_helper'
 
-describe "#Fileman.rename_r" do
+describe "#Fileman.rename" do
 	let(:folder_name) { "TestFolder" }
 	let(:new_folder_name) { "a" }
 
@@ -20,7 +20,7 @@ describe "#Fileman.rename_r" do
 
 	describe 'rename folder' do
 
-		it 'rename the folder and all its subfolders recursively' do
+		it 'rename the folder' do
 			File.directory?(folder_name).must_equal true
 			File.directory?("#{folder_name}/SubFolder_1").must_equal true
 			File.directory?("#{folder_name}/SubFolder_2").must_equal true
@@ -28,7 +28,25 @@ describe "#Fileman.rename_r" do
 			File.file?("#{folder_name}/SubFolder_1/test_file_1.txt").must_equal true
 			File.file?("#{folder_name}/SubFolder_2/test_file.txt").must_equal true
 
-			Fileman.rename_r folder_name, new_folder_name
+			Fileman.rename folder_name, new_folder_name
+
+			File.directory?("a").must_equal true
+			File.directory?("a/SubFolder_1").must_equal true
+			File.directory?("a/SubFolder_2").must_equal true
+			File.file?("a/SubFolder_1/test_file.txt").must_equal true
+			File.file?("a/SubFolder_1/test_file_1.txt").must_equal true
+			File.file?("a/SubFolder_2/test_file.txt").must_equal true
+		end
+
+		it 'rename the folder and all its subfolders recursively if the :recursive option is true' do
+			File.directory?(folder_name).must_equal true
+			File.directory?("#{folder_name}/SubFolder_1").must_equal true
+			File.directory?("#{folder_name}/SubFolder_2").must_equal true
+			File.file?("#{folder_name}/SubFolder_1/test_file.txt").must_equal true
+			File.file?("#{folder_name}/SubFolder_1/test_file_1.txt").must_equal true
+			File.file?("#{folder_name}/SubFolder_2/test_file.txt").must_equal true
+
+			Fileman.rename folder_name, new_folder_name, {:recursive => true}
 
 			File.directory?("a").must_equal true
 			File.directory?("a/a").must_equal true
@@ -38,7 +56,7 @@ describe "#Fileman.rename_r" do
 			File.file?("a/a1/test_file.txt").must_equal true
 		end
 
-		it 'rename the folder and all its subfolders recursively, including all files ' +
+		it 'rename the folder and all its subfolders recursively, including all files, if both the :include_files and :recursive options are true' +
 		'if option :include_files is true' do
 			File.directory?(folder_name).must_equal true
 			File.directory?("#{folder_name}/SubFolder_1").must_equal true
@@ -47,7 +65,7 @@ describe "#Fileman.rename_r" do
 			File.file?("#{folder_name}/SubFolder_1/test_file_1.txt").must_equal true
 			File.file?("#{folder_name}/SubFolder_2/test_file.txt").must_equal true
 
-			Fileman.rename_r folder_name, new_folder_name, {:include_files => true}
+			Fileman.rename folder_name, new_folder_name, {:include_files => true, :recursive => true}
 
 			File.directory?("a").must_equal true
 			File.directory?("a/a").must_equal true
@@ -58,7 +76,7 @@ describe "#Fileman.rename_r" do
 		end
 
 		it 'rename the folder and all its subfolders recursively, including all files ' +
-		'WITHOUT their extensions if both options :include_files and :ignore_ext are true' do
+		'WITHOUT their extensions if options :include_files, :ignore_ext, and :recursive are true' do
 			File.directory?(folder_name).must_equal true
 			File.directory?("#{folder_name}/SubFolder_1").must_equal true
 			File.directory?("#{folder_name}/SubFolder_2").must_equal true
@@ -66,7 +84,7 @@ describe "#Fileman.rename_r" do
 			File.file?("#{folder_name}/SubFolder_1/test_file_1.txt").must_equal true
 			File.file?("#{folder_name}/SubFolder_2/test_file.txt").must_equal true
 
-			Fileman.rename_r folder_name, new_folder_name, {:include_files => true, :ignore_ext => true}
+			Fileman.rename folder_name, new_folder_name, {:include_files => true, :ignore_ext => true, :recursive => true}
 
 			File.directory?("a").must_equal true
 			File.directory?("a/a").must_equal true
